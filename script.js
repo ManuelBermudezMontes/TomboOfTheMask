@@ -6,137 +6,160 @@ const { append, cons, first, isEmpty, isList, length, rest } = functionalLight;
 
 function make(data, attribute) 
 {
-	return Object.assign({}, data, attribute);
+  return Object.assign({}, data, attribute);
 }
+
 
 function apply(a, f) 
 {
     if (!isEmpty(a)) 
     {
-		  f(first(a));
-		  apply(rest(a), f);
-	  }
+      f(first(a));
+      apply(rest(a), f);
+    }
 }
 
-function moveSnake(snake, dir) 
-{
-	const head = first(snake);
-	return cons({x: head.x + dir.x, y: head.y + dir.y}, snake.slice(0, length(snake) - 1));
-}
-
-const dx = 15; 
-const dy = 15;
+//globales
+const unit = 50;
+const size = 500;
+const maxUnits = size/unit;
 
 function sketchProc(processing) 
 {
+  
+  /**
+   * Esto se llama antes de iniciar (espacio de trabajo)
+   */
+  processing.setup = function () 
+  {
+    tomboImagen = processing.loadImage("images/tomb.png");
+    muro = processing.loadImage("images/muro.jpg");
+    processing.frameRate(10);
+    processing.size(size, size);
+    processing.state = 
+    {
+      snake: [{ x: 4, y: 1 },{ x: 3, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 }], 
+      dir: {x: 1, y: 0},
+      tombo:{x:6, y:6},
+      mapa: [
+              [1,1,1,1,1,1,1,1,1,1,1],
+              [1,1,0,1,1,1,1,1,1,1,1],
+              [1,1,0,1,1,1,1,1,1,1,1],
+              [1,1,0,0,0,0,0,1,1,1,1],
+              [1,1,1,1,1,1,0,1,1,1,1],
+              [1,1,1,1,1,1,0,1,1,1,1],
+              [1,1,1,1,1,1,2,1,1,1,1],
+              [1,1,1,1,1,1,0,1,1,1,1],
+              [1,1,1,1,1,1,0,1,1,1,1],
+              [1,1,0,0,0,0,0,1,1,1,1],
+              [1,1,0,1,1,1,1,1,1,1,1],
+              [1,1,0,1,1,1,1,1,1,0,1],
+              [1,1,1,1,1,1,1,1,1,1,1]
+            ]
+      
+    };
+  }
+   
 
-	/**
-	 * Esto se llama antes de iniciar (espacio de trabajo)
-	 */
-	processing.setup = function () 
-	{
-	 	processing.frameRate(10);
-		processing.size(400, 400);
-		processing.state = {snake: [{ x: 4, y: 1 },{ x: 3, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 }], dir: {x: 1, y: 0}};
-	}
-	 
+  // Dibuja algo en el canvas. Aqui se pone todo lo que quieras pintar
+  processing.drawGame = function (world) 
+  {
+    processing.background(0, 0, 0);
+    
+    let atributosCentro = atributosDeCentro(world.tombo);
+    //console.log(imapaY+" a "+imapaX);
+    let mapaRecortado = recortarLista(world.mapa, atributosCentro.imapaY, 0);
+    dibujarMapa(mapaRecortado, atributosCentro.imapaY, atributosCentro.imapaX, 0, processing);
 
-	// Dibuja algo en el canvas. Aqui se pone todo lo que quieras pintar
-	processing.drawGame = function (world) 
-	{
-		processing.background(0, 150, 0);
-		apply(world.snake, sn => 
-		{
-			processing.fill(160, 160, 240);
-			processing.rect(sn.x * dx, sn.y * dy, dx, dy);
-		});
+    processing.image(tomboImagen, atributosCentro.tomboCentrado, atributosCentro.tomboCentrado, unit, unit);
+    
+  }
 
-	}
+  // Actualiza el mundo despues de cada frame. En este ejemplo, no cambia nada, solo retorna una copia del mundo
+  processing.onTic = function (world) 
+  {
+    return make(world, {});
+  }
 
-	// Actualiza el mundo despues de cada frame. En este ejemplo, no cambia nada, solo retorna una copia del mundo
-	processing.onTic = function (world) 
-	{
-		return make(world, {snake: moveSnake(world.snake, world.dir)});
-	}
+  //Implemente esta función si quiere que su programa reaccione a eventos del mouse
+  processing.onMouseEvent = function (world, event) 
+  {
+    // Por ahora no cambia el mundo. Solo retorna una copia del mundo actual
+    return make(world, {});
+  };
 
-	//Implemente esta función si quiere que su programa reaccione a eventos del mouse
-	processing.onMouseEvent = function (world, event) 
-	{
-		// Por ahora no cambia el mundo. Solo retorna una copia del mundo actual
-		return make(world, {});
-	};
-
-	//Implemente esta función si quiere que su programa reaccione a eventos del teclado
-	processing.onKeyEvent = function (world, keyCode) 
-	{
-		if (keyCode==processing.UP && world.dir.y != 1){
-			return make(world, {dir: {x: 0, y: -1}});
-		}
-		if (keyCode==processing.DOWN && world.dir.y != -1){
-			return make(world, {dir: {x: 0, y: 1}});
-		}
-		if (keyCode==processing.LEFT && world.dir.x != 1){
-			return make(world, {dir: {x: -1, y: 0}});
-		}
-		if (keyCode==processing.RIGHT && world.dir.x != -1){
-			return make(world, {dir: {x: 1, y: 0}});
-		}
-		return make(world, {dir:{ x: world.dir.x, y: world.dir.y}});
-	    
-	}
+  //Implemente esta función si quiere que su programa reaccione a eventos del teclado
+  processing.onKeyEvent = function (world, keyCode) 
+  {
+    if (keyCode==processing.UP){
+      return make(world, {tombo: {x: world.tombo.x, y: world.tombo.y-1}});
+    }
+    if (keyCode==processing.DOWN){
+      return make(world, {tombo: {x: world.tombo.x, y: world.tombo.y+1}});
+    }
+    if (keyCode==processing.LEFT){
+      return make(world, {tombo: {x: world.tombo.x-1, y: world.tombo.y}});
+    }
+    if (keyCode==processing.RIGHT){
+      return make(world, {tombo: {x: world.tombo.x+1, y: world.tombo.y}});
+    }
+    return make(world, {tombo: {x: world.tombo.x, y: world.tombo.y}});
+      
+  }
 
 
-	// ******************** De aquí hacia abajo no debe cambiar nada. ********************
+ 
+  // ******************** De aquí hacia abajo no debe cambiar nada. ********************
 
-	// Esta es la función que pinta todo. Se ejecuta n veces por segundo. 
-	// No cambie esta función. Su código debe ir en drawGame
-	processing.draw = function () 
-	{
-		processing.drawGame(processing.state);
-		processing.state = processing.onTic(processing.state);
-	};
+  // Esta es la función que pinta todo. Se ejecuta n veces por segundo. 
+  // No cambie esta función. Su código debe ir en drawGame
+  processing.draw = function () 
+  {
+    processing.drawGame(processing.state);
+    processing.state = processing.onTic(processing.state);
+  };
 
-	// Esta función se ejecuta cada vez que presionamos una tecla. 
-	// No cambie esta función. Su código debe ir en onKeyEvent
-	processing.keyPressed = function () 
-	{      
-		processing.state = processing.onKeyEvent(processing.state, processing.keyCode);
-	}
+  // Esta función se ejecuta cada vez que presionamos una tecla. 
+  // No cambie esta función. Su código debe ir en onKeyEvent
+  processing.keyPressed = function () 
+  {      
+    processing.state = processing.onKeyEvent(processing.state, processing.keyCode);
+  }
 
-	// Esta función se ejecuta cada vez movemos el mouse. 
-	// No cambie esta función. Su código debe ir en onKeyEvent
-	processing.mouseMoved = function () 
-	{
-		processing.state = processing.onMouseEvent(processing.state,
-		 { action: "move", mouseX: processing.mouseX, mouseY: processing.mouseY });
-	}
+  // Esta función se ejecuta cada vez movemos el mouse. 
+  // No cambie esta función. Su código debe ir en onKeyEvent
+  processing.mouseMoved = function () 
+  {
+    processing.state = processing.onMouseEvent(processing.state,
+     { action: "move", mouseX: processing.mouseX, mouseY: processing.mouseY });
+  }
 
-	// Estas funciones controlan los eventos del mouse. 
-	// No cambie estas funciones. Su código debe ir en OnMouseEvent
-	processing.mouseClicked = function () 
-	{
-		processing.state = processing.onMouseEvent(processing.state,
-		{ action: "click", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
-	}
+  // Estas funciones controlan los eventos del mouse. 
+  // No cambie estas funciones. Su código debe ir en OnMouseEvent
+  processing.mouseClicked = function () 
+  {
+    processing.state = processing.onMouseEvent(processing.state,
+    { action: "click", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
+  }
 
-	processing.mouseDragged = function () 
-	{
-		processing.state = processing.onMouseEvent(processing.state,
-		{ action: "drag", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
-	}
+  processing.mouseDragged = function () 
+  {
+    processing.state = processing.onMouseEvent(processing.state,
+    { action: "drag", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
+  }
 
-	processing.mousePressed = function () 
-	{
-	  processing.state = processing.onMouseEvent(processing.state,
-	    { action: "press", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
-	}
+  processing.mousePressed = function () 
+  {
+    processing.state = processing.onMouseEvent(processing.state,
+      { action: "press", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
+  }
 
-	processing.mouseReleased = function () 
-	{
-	  processing.state = processing.onMouseEvent(processing.state,
-	    { action: "release", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
-	}
-	// Fin de los eventos del mouse
+  processing.mouseReleased = function () 
+  {
+    processing.state = processing.onMouseEvent(processing.state,
+      { action: "release", mouseX: processing.mouseX, mouseY: processing.mouseY, mouseButton: processing.mouseButton });
+  }
+  // Fin de los eventos del mouse
 }
 
 var canvas = document.getElementById("canvas");
