@@ -2,7 +2,7 @@ function dibujarMapa(mapa,imapaY, imapaX, icanvasY,processing)
 {
   if (icanvasY < maxUnits)
   {
-    if(imapaY<0 || imapaY>12)
+    if(imapaY<0 || imapaY>columnaTamanio)
     {
       dibujarHileraNeutral(icanvasY*unit, 0, processing);
       dibujarMapa(mapa, imapaY+1, imapaX, icanvasY+1, processing);
@@ -29,7 +29,7 @@ function dibujarHilera(hilera,imapaX,y,icanvasX,processing)
 {
   if(icanvasX < maxUnits)
   {
-    if(imapaX<0 || imapaX>10)
+    if(imapaX<0 || imapaX>hileraTamanio)
     {
       let x = icanvasX*unit;
       processing.image(muro,x,y,unit,unit);

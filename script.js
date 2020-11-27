@@ -19,10 +19,27 @@ function apply(a, f)
     }
 }
 
+function moverTombo(tombo, dir, mapa)
+{
+  
+  if
+  (
+    ((dir.x==1 && mapa[tombo.y][tombo.x+1]==1) || (dir.x==-1 && mapa[tombo.y][tombo.x-1]==1) ||
+    (dir.y==1 && mapa[tombo.y+1][tombo.x]==1) || (dir.y==-1 && mapa[tombo.y-1][tombo.x]==1)) ||
+    (dir.x==0 && dir.y==0)
+  ) 
+    return {x: tombo.x, y: tombo.y, enMovimiento: false};
+  else
+    return {x: tombo.x+dir.x, y: tombo.y+dir.y, enMovimiento: true};
+  
+}
+
 //globales
-const unit = 50;
-const size = 500;
+const unit = 40;
+const size = 800;
 const maxUnits = size/unit;
+const columnaTamanio = 29;
+const hileraTamanio = 16;
 
 function sketchProc(processing) 
 {
@@ -34,27 +51,43 @@ function sketchProc(processing)
   {
     tomboImagen = processing.loadImage("images/tomb.png");
     muro = processing.loadImage("images/muro.jpg");
-    processing.frameRate(10);
+    processing.frameRate(30);
     processing.size(size, size);
     processing.state = 
     {
-      snake: [{ x: 4, y: 1 },{ x: 3, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 }], 
-      dir: {x: 1, y: 0},
-      tombo:{x:6, y:6},
+      dir: {x: 0, y: 0},
+      tombo:{x:10, y:28 , enMovimiento:false},
       mapa: [
-              [1,1,1,1,1,1,1,1,1,1,1],
-              [1,1,0,1,1,1,1,1,1,1,1],
-              [1,1,0,1,1,1,1,1,1,1,1],
-              [1,1,0,0,0,0,0,1,1,1,1],
-              [1,1,1,1,1,1,0,1,1,1,1],
-              [1,1,1,1,1,1,0,1,1,1,1],
-              [1,1,1,1,1,1,2,1,1,1,1],
-              [1,1,1,1,1,1,0,1,1,1,1],
-              [1,1,1,1,1,1,0,1,1,1,1],
-              [1,1,0,0,0,0,0,1,1,1,1],
-              [1,1,0,1,1,1,1,1,1,1,1],
-              [1,1,0,1,1,1,1,1,1,0,1],
-              [1,1,1,1,1,1,1,1,1,1,1]
+              [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1],
+              [1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1],  
+              [1,1,1,1,1,1,1,0,0,0,1,0,1,1,1,1,1],
+              [1,1,1,1,1,1,1,0,0,0,1,0,1,1,1,1,1],
+              [1,1,1,1,1,1,1,0,0,0,1,0,1,1,1,1,1],
+              [1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1],
+              [1,1,1,1,0,0,0,0,1,1,1,0,1,1,1,1,1],
+              [1,1,1,1,0,1,1,0,1,1,1,0,1,1,1,1,1],
+              [1,1,1,1,0,1,1,0,0,0,0,0,1,1,1,1,1],
+              [1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1],
+              [1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1],
+              [1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1],
+              [1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+              [1,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,1],
+              [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1],
+              [1,1,1,1,1,1,1,1,1,1,2,0,0,0,0,0,1],
+              [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
             ]
       
     };
@@ -64,10 +97,9 @@ function sketchProc(processing)
   // Dibuja algo en el canvas. Aqui se pone todo lo que quieras pintar
   processing.drawGame = function (world) 
   {
-    processing.background(0, 0, 0);
+    processing.background(10, 10, 10);
     
     let atributosCentro = atributosDeCentro(world.tombo);
-    //console.log(imapaY+" a "+imapaX);
     let mapaRecortado = recortarLista(world.mapa, atributosCentro.imapaY, 0);
     dibujarMapa(mapaRecortado, atributosCentro.imapaY, atributosCentro.imapaX, 0, processing);
 
@@ -78,7 +110,7 @@ function sketchProc(processing)
   // Actualiza el mundo despues de cada frame. En este ejemplo, no cambia nada, solo retorna una copia del mundo
   processing.onTic = function (world) 
   {
-    return make(world, {});
+    return make(world, { tombo: moverTombo(world.tombo, world.dir, world.mapa)});
   }
 
   //Implemente esta función si quiere que su programa reaccione a eventos del mouse
@@ -91,19 +123,19 @@ function sketchProc(processing)
   //Implemente esta función si quiere que su programa reaccione a eventos del teclado
   processing.onKeyEvent = function (world, keyCode) 
   {
-    if (keyCode==processing.UP){
-      return make(world, {tombo: {x: world.tombo.x, y: world.tombo.y-1}});
+    if (keyCode==processing.UP && !world.tombo.enMovimiento){
+      return make(world, {dir: {x: 0, y: -1}});
     }
-    if (keyCode==processing.DOWN){
-      return make(world, {tombo: {x: world.tombo.x, y: world.tombo.y+1}});
+    if (keyCode==processing.DOWN && !world.tombo.enMovimiento){
+      return make(world, {dir: {x: 0, y: 1}});
     }
-    if (keyCode==processing.LEFT){
-      return make(world, {tombo: {x: world.tombo.x-1, y: world.tombo.y}});
+    if (keyCode==processing.LEFT && !world.tombo.enMovimiento){
+      return make(world, {dir: {x: -1, y: 0}});
     }
-    if (keyCode==processing.RIGHT){
-      return make(world, {tombo: {x: world.tombo.x+1, y: world.tombo.y}});
+    if (keyCode==processing.RIGHT && !world.tombo.enMovimiento){
+      return make(world, {dir: {x: 1, y: 0}});
     }
-    return make(world, {tombo: {x: world.tombo.x, y: world.tombo.y}});
+    return make(world, {dir: {x: world.dir.x, y: world.dir.y}});
       
   }
 
