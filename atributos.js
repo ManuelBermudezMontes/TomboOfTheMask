@@ -1,3 +1,6 @@
+//contrato: atributosDeCentro structure ->structure
+//proposito: retorna indice en donde deberia empezar el mapa, y el centrado del tombo
+//ejemplo atributosDeCentro({x:0, x:0, enMovimiento: false})-> {tomboCentrado:400, imapaX: -10, imapaX: -10};
 function atributosDeCentro(tombo)
 {
   let atributosCentro =

@@ -1,0 +1,45 @@
+* {
+    margin: 2;
+    padding: 0;
+}
+
+body{
+  
+    background: url("images/f2.jpg");
+    background-repeat: no-repeat;
+   -webkit-background-size: cover;
+   -moz-background-size: cover;
+   -o-background-size: cover;
+   background-size: cover;
+} 
+
+body li a{
+   display:block;
+    text-decoration: none;
+    font-size:40px;
+    height: 50px; 
+    width:100%;
+    font-family: comic sans-serif;
+    color: rgb(196, 43, 216);
+    padding: 0 20px;
+} 
+
+body div {
+   display:block;
+    text-decoration:none;
+    font-size:40px;
+    height: 50px;
+    width:100%;
+    font-family: sans-serif;
+    color: rgb(255, 255, 255), 255, 255);
+    padding: 10px;
+}
+
+body div a {
+    display:block;
+    text-decoration:inherit;
+    font-size:20px;
+    font-family: sans-serif;
+    color: rgb(255, 255, 255);
+    padding: 20px;
+}
